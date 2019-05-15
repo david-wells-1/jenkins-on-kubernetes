@@ -1,0 +1,90 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: jenkins
+  labels:
+    name: jenkins
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: jenkins-volume
+  namespace: jenkins
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  hostPath:
+    path: /tmp/jenkins_home
+    type: DirectoryOrCreate
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jenkins-claim
+  namespace: jenkins
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 1Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: jenkins
+  namespace: jenkins
+  labels:
+    name: jenkins
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30000
+  selector:
+    app: jenkins
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: jenkins-deployment
+  namespace: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - name: jenkins
+        image: jenkins/jenkins:2.176
+        ports:
+        - name: http-port
+          containerPort: 8080
+        - name: jnlp-port
+          containerPort: 50000
+        volumeMounts:
+          - name: jenkins-volume
+            mountPath: /var/jenkins_home
+      volumes:
+        - name: jenkins-volume
+          persistentVolumeClaim:
+            claimName: jenkins-claim
