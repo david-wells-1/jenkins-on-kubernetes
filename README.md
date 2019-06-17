@@ -9,7 +9,7 @@ The Jenkins master is configured to use local persistent storage, which will onl
  * macOS Mojave 10.14.4
  * Docker CE 2.0.0.3
  * Kubernetes v1.10.11
- * Jenkins v2.176
+ * Jenkins latest version (latest version = v2.181)
 
 A Kubernetes cluster called `docker-for-desktop` is created by enabling Kubernetes in Docker preferences.
 
