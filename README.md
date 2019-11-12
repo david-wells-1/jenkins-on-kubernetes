@@ -16,7 +16,7 @@ A Kubernetes cluster called `docker-for-desktop` is created by enabling Kubernet
 ### Kubernetes Dashboard
 To enable the Kubernetes dashboard:
 ```
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
 kubectl proxy &
 ```
 
